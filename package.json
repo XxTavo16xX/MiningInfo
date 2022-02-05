@@ -1,0 +1,25 @@
+{
+  "name": "mininginfo",
+  "version": "1.0.0",
+  "description": "An app to show the gpu temperature in taskbar",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "electron ./",
+    "generate": "node ./source/app/modules/generateIcon/imageGenerator.js"
+  },
+  "keywords": [
+    "Mining",
+    "GPU",
+    "Temperature"
+  ],
+  "author": "Armando Peralta",
+  "license": "ISC",
+  "dependencies": {
+    "canvas": "^2.9.0",
+    "electron": "^17.0.0",
+    "fs": "^0.0.1-security",
+    "path": "^0.12.7",
+    "systeminformation": "^5.11.2"
+  }
+}

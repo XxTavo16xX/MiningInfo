@@ -14,7 +14,7 @@
 const { app, BrowserWindow, ipcMain, Tray, Menu, nativeImage } = require('electron')
 const fs = require('fs')
 const si = require('systeminformation')
-const path =  require('path')
+const path = require('path')
 
 // Window
 
@@ -24,54 +24,66 @@ function createMainScreen() {
 
     mainScreen = new BrowserWindow({
 
-        width: 1280,
-        height: 720,
+        width: 600,
+        height: 600,
         resizable: false,
-        icon: './source/views/css/resources/icons/favicon/favicon.ico',
+        icon: './source/views/css/resources/icons/favicon.ico',
         transparent: true,
         frame: false,
+        webPreferences: {
+            preload: path.join(__dirname, '/source/app/modules/MiningInfo_API/index.js')
+        }
 
     })
 
     mainScreen.removeMenu()
-    mainScreen.webContents.openDevTools()
-    mainScreen.loadFile('./views/mainScreen.html')
+    mainScreen.loadFile('./source/views/mainScreen.html')
 
 }
 
 async function createAppTray() {
 
     // This function will get the GPU Temperature and create the tray of the app then will be updated .5 later
-    
+
     const gpuData = await si.graphics()
     const gpuTemperature = gpuData.controllers[0].temperatureGpu
 
     let iconToSet = 'iconTray' + gpuTemperature + '.png'
-      
+
     const icon = nativeImage.createFromPath(path.join(__dirname, 'source/app/src/icons/' + iconToSet))
     appTray = new Tray(icon)
 
     const contextMenu = Menu.buildFromTemplate([
+        { label: 'Mostrar en ventana', click: () => createMainScreen() },
         { label: 'Cerrar Mining Info', click: () => QuitApp() }
     ])
 
     appTray.setContextMenu(contextMenu)
-    
+
     appTray.setToolTip('Mining Info')
+
+    appTray.on('click', function (e) {
+
+        if(mainScreen == undefined || mainScreen == null ) { createMainScreen() }
+        
+        if (!mainScreen.isVisible()) {
+            mainScreen.show()
+        }
+    });
 
     updateTrayIcon()
 
 }
 
-async function updateTrayIcon(){
+async function updateTrayIcon() {
 
     let gpuTemperatureState = 'green'
 
     const gpuData = await si.graphics()
     const gpuTemperature = gpuData.controllers[0].temperatureGpu
-    
+
     let iconToSet = 'iconTray' + gpuTemperature + '.png'
-      
+
     const icon = nativeImage.createFromPath(path.join(__dirname, 'source/app/src/icons/' + iconToSet))
     appTray.setImage(icon);
 
@@ -81,13 +93,23 @@ async function updateTrayIcon(){
 
 app.whenReady().then(() => {
 
-    createAppTray()
     //createMainScreen()
+    createAppTray()
 })
 
-function QuitApp(){
+ipcMain.on("app-titleBar", (event, titleBarEvent) => {
 
-    console.log('askjdalksjd')
+    switch (titleBarEvent) {
+
+        case 'minimize':
+            mainScreen.hide()
+            break;
+    }
+
+});
+
+function QuitApp() {
+
     app.exit()
 
 }

@@ -1,6 +1,6 @@
 {
   "name": "mininginfo",
-  "version": "1.0.0",
+  "version": "2.0.0",
   "description": "An app to show the gpu temperature in taskbar",
   "main": "index.js",
   "scripts": {
